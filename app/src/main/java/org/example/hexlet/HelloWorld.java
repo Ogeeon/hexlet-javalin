@@ -3,6 +3,7 @@ package org.example.hexlet;
 import io.javalin.Javalin;
 
 public class HelloWorld {
+    
     public static void main(String[] args) {
         // Создаем приложение
         var app = Javalin.create(config -> {
@@ -10,9 +11,10 @@ public class HelloWorld {
         });
         // Описываем, что загрузится по адресу /
         app.get("/", ctx -> ctx.result("Hello from Hexlet"));
-        app.get("/hello", ctx -> {
-            var name = ctx.queryParam("name");
-            ctx.result(String.format("Hello, %s", name == null ? "World" : name));
+        app.get("users/{id}/post/{postId}", ctx -> {
+            var userId = ctx.pathParam("id");
+            var postId =  ctx.pathParam("id");
+            ctx.result("User ID: " + userId + " post ID: " + postId);
         });
         app.start(7070); // Стартуем веб-сервер
     }
