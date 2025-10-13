@@ -1,25 +1,31 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Hello Hexlet!</title>
-    </head>
-    <body>
+@import org.example.hexlet.dto.courses.BuildCoursePage
+@param BuildCoursePage page
+
+@template.layout.landing_page(
+  content = @`
+    @if(page.getErrors() != null)
+        <ul>
+            @for(var validator : page.getErrors().values())
+                @for(var error : validator)
+                    <li>${error.getMessage()}</li>
+                @endfor
+            @endfor
+        </ul>
+    @endif
       <form action="/courses" method="post">
         <div>
           <label>
             Название
-            <input type="text" equired name="name" />
+            <input type="text" required name="name" value="${page.getName()}"/>
           </label>
         </div>
         <div>
           <label>
             Описание
-            <input type="description" required name="description" />
+            <input type="description" required name="description" value="${page.getDescription()}"/>
           </label>
         </div>
         <input type="submit" value="Добавить" />
       </form>
-    </body>
-</html>
+  `
+)

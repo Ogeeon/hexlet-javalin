@@ -22,5 +22,9 @@
                 @endif
             </body>
         </html>
+    `,
+    footer = @`
+        <hr>
+        <a href="/users/build">Register a User</a>
     `
 )

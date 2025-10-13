@@ -1,7 +1,9 @@
 package org.example.hexlet;
 
+import org.example.hexlet.dto.courses.BuildCoursePage;
 import org.example.hexlet.dto.courses.CoursePage;
 import org.example.hexlet.dto.courses.CoursesPage;
+import org.example.hexlet.dto.users.BuildUserPage;
 import org.example.hexlet.dto.users.UserPage;
 import org.example.hexlet.dto.users.UsersPage;
 import org.example.hexlet.model.Course;
@@ -13,6 +15,7 @@ import io.javalin.Javalin;
 import io.javalin.http.NotFoundResponse;
 import io.javalin.rendering.template.JavalinJte;
 import static io.javalin.rendering.template.TemplateUtil.model;
+import io.javalin.validation.ValidationException;
 
 public class HelloWorld {
     public static void main(String[] args) {
@@ -26,7 +29,8 @@ public class HelloWorld {
             ctx.render("courses/index.jte", model("page", coursesPage));
         });
         app.get("/courses/build", ctx -> {
-           ctx.render("courses/build.jte");
+            var page = new BuildCoursePage();
+            ctx.render("courses/build.jte", model("page", page));
         });
         app.get("/courses/{id}", ctx -> {
             var id = ctx.pathParamAsClass("id", Long.class).get();
@@ -36,23 +40,34 @@ public class HelloWorld {
             ctx.render("courses/show.jte", model("page", page));
         });
         app.post("/courses", ctx -> {
-            var namePrm = ctx.formParam("name");
-            var descrPrm = ctx.formParam("description");
-            if (namePrm != null && descrPrm != null) {
-                var name = namePrm.trim();
-                var description = descrPrm.trim();
-
+            var rawName = ctx.formParam("name");
+            var rawDescription = ctx.formParam("description");
+            try {
+                var name = ctx.formParamAsClass("name", String.class)
+                    .check(value -> String.valueOf(value).length() > 2, "Слишком короткое название")
+                    .get();
+                var description = ctx.formParamAsClass("description", String.class)
+                    .check(value -> String.valueOf(value).length() > 10, "Слишком короткое описание")
+                    .get();
                 var Course = new Course(name, description);
                 CourseRepository.save(Course);
+                ctx.redirect("/courses");
+            } catch (ValidationException e) {
+                var name = ctx.formParam("name");
+                var description = ctx.formParam("description");
+                System.err.printf("name=%s, descr=%s, rn=%s, rd=%s", name, description, rawName, rawDescription);
+                var page = new BuildCoursePage(rawName, rawDescription, e.getErrors());
+                ctx.render("courses/build.jte", model("page", page));
             }
-            ctx.redirect("/courses");
         });
+
         app.get("/users", ctx -> {
             var usersPage = new UsersPage(UserRepository.getEntities(), "List of users");
             ctx.render("users/index.jte", model("page", usersPage));
         });
         app.get("/users/build", ctx -> {
-           ctx.render("users/build.jte");
+            var page = new BuildUserPage();
+            ctx.render("users/build.jte", model("page", page));
         });
         app.get("/users/{id}", ctx -> {
             var id = ctx.pathParamAsClass("id", Long.class).get();
@@ -62,18 +77,21 @@ public class HelloWorld {
             ctx.render("users/show.jte", model("page", page));
         });
         app.post("/users", ctx -> {
-            var namePrm = ctx.formParam("name");
-            var emailPrm = ctx.formParam("email");
-            var pwdPrm = ctx.formParam("password");
-            if (namePrm != null && emailPrm != null && pwdPrm != null) {
-                var name = namePrm.trim();
-                var email = emailPrm.trim().toLowerCase();
-                var password = pwdPrm;
+            var name = ctx.formParam("name");
+            var email = ctx.formParam("email");
 
+            try {
+                var passwordConfirmation = ctx.formParam("passwordConfirmation");
+                var password = ctx.formParamAsClass("password", String.class)
+                        .check(value -> value.equals(passwordConfirmation), "Пароли не совпадают")
+                        .get();
                 var user = new User(name, email, password);
                 UserRepository.save(user);
+                ctx.redirect("/users");
+            } catch (ValidationException e) {
+                var page = new BuildUserPage(name, email, e.getErrors());
+                ctx.render("users/build.jte", model("page", page));
             }
-            ctx.redirect("/users");
         });
         app.start(7070);
     }

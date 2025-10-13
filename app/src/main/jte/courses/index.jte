@@ -22,4 +22,9 @@
                 @endif
             </body>
         </html>
-`)
+    `,
+    footer = @`
+        <hr>
+        <a href="/courses/build">Add a course</a>
+    `
+)
