@@ -33,4 +33,11 @@ public class CourseRepository {
     public static List<Course> getEntities() {
         return entities;
     }
+    
+    public static void delete(Long id) {
+        var target = find(id);
+        if (target.isPresent()) {
+            entities.remove(target.get());
+        }
+    }
 }

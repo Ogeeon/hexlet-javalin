@@ -10,7 +10,7 @@
                 <meta charset="utf-8" />
             </head>
             <body>
-                <h1>${page.getHeader()}</h1>
+                <h1>List of courses</h1>
                 @if(page.getCourses().isEmpty())
                     <p>Пока не добавлено ни одного курса</p>
                 @else

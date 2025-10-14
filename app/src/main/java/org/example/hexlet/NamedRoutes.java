@@ -3,11 +3,11 @@ package org.example.hexlet;
 public class NamedRoutes {
 
     public static String usersPath() {
-        return "/u";
+        return "/users";
     }
 
     public static String buildUserPath() {
-        return "/u/build";
+        return "/users/build";
     }
 
     // Это нужно, чтобы не преобразовывать типы снаружи
@@ -16,7 +16,7 @@ public class NamedRoutes {
     }
 
     public static String userPath(String id) {
-        return "/u/" + id;
+        return "/users/" + id;
     }
 
     public static String coursesPath() {
