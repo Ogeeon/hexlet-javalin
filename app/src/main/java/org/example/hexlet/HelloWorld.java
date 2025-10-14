@@ -24,59 +24,56 @@ public class HelloWorld {
             config.fileRenderer(new JavalinJte());
         });
         app.get("/", ctx -> ctx.render("index.jte"));
-        app.get("/courses", ctx -> {
+        app.get(NamedRoutes.coursesPath(), ctx -> {
             var coursesPage = new CoursesPage(CourseRepository.getEntities(), "List of courses");
             ctx.render("courses/index.jte", model("page", coursesPage));
         });
-        app.get("/courses/build", ctx -> {
+        app.get(NamedRoutes.buildCoursePath(), ctx -> {
             var page = new BuildCoursePage();
             ctx.render("courses/build.jte", model("page", page));
         });
-        app.get("/courses/{id}", ctx -> {
+        app.get(NamedRoutes.coursesPath()+"/{id}", ctx -> {
             var id = ctx.pathParamAsClass("id", Long.class).get();
             var course = CourseRepository.find(id).orElseThrow(() -> new NotFoundResponse("Course with id = " + id + " not found"));
             course.setId(id);
             var page = new CoursePage(course);
             ctx.render("courses/show.jte", model("page", page));
         });
-        app.post("/courses", ctx -> {
+        app.post(NamedRoutes.coursesPath(), ctx -> {
             var rawName = ctx.formParam("name");
             var rawDescription = ctx.formParam("description");
             try {
                 var name = ctx.formParamAsClass("name", String.class)
-                    .check(value -> String.valueOf(value).length() > 2, "Слишком короткое название")
+                    .check(value -> value.length() > 2, "Слишком короткое название")
                     .get();
                 var description = ctx.formParamAsClass("description", String.class)
                     .check(value -> String.valueOf(value).length() > 10, "Слишком короткое описание")
                     .get();
                 var Course = new Course(name, description);
                 CourseRepository.save(Course);
-                ctx.redirect("/courses");
+                ctx.redirect(NamedRoutes.coursesPath());
             } catch (ValidationException e) {
-                var name = ctx.formParam("name");
-                var description = ctx.formParam("description");
-                System.err.printf("name=%s, descr=%s, rn=%s, rd=%s", name, description, rawName, rawDescription);
                 var page = new BuildCoursePage(rawName, rawDescription, e.getErrors());
                 ctx.render("courses/build.jte", model("page", page));
             }
         });
 
-        app.get("/users", ctx -> {
+        app.get(NamedRoutes.usersPath(), ctx -> {
             var usersPage = new UsersPage(UserRepository.getEntities(), "List of users");
             ctx.render("users/index.jte", model("page", usersPage));
         });
-        app.get("/users/build", ctx -> {
+        app.get(NamedRoutes.buildUserPath(), ctx -> {
             var page = new BuildUserPage();
             ctx.render("users/build.jte", model("page", page));
         });
-        app.get("/users/{id}", ctx -> {
+        app.get(NamedRoutes.usersPath()+"/{id}", ctx -> {
             var id = ctx.pathParamAsClass("id", Long.class).get();
             var user = UserRepository.find(id).orElseThrow(() -> new NotFoundResponse("User with id = " + id + " not found"));
             user.setId(id);
             var page = new UserPage(user);
             ctx.render("users/show.jte", model("page", page));
         });
-        app.post("/users", ctx -> {
+        app.post(NamedRoutes.usersPath(), ctx -> {
             var name = ctx.formParam("name");
             var email = ctx.formParam("email");
 
@@ -87,7 +84,7 @@ public class HelloWorld {
                         .get();
                 var user = new User(name, email, password);
                 UserRepository.save(user);
-                ctx.redirect("/users");
+                ctx.redirect(NamedRoutes.usersPath());
             } catch (ValidationException e) {
                 var page = new BuildUserPage(name, email, e.getErrors());
                 ctx.render("users/build.jte", model("page", page));
