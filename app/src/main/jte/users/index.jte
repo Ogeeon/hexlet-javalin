@@ -3,6 +3,7 @@
 @param UsersPage page
 
 @template.layout.landing_page(
+    page = page,
     content = @`
         <html>
             <head>

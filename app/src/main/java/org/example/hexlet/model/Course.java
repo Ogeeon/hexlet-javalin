@@ -14,8 +14,8 @@ public final class Course {
     private String name;
     private String description;
 
-    public Course(String name, String description) {
-        this.name = name;
-        this.description = description;
+    public Course(String courseName, String courseDescription) {
+        this.name = courseName;
+        this.description = courseDescription;
     }
 }

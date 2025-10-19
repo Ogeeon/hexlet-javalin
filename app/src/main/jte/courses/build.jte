@@ -3,6 +3,7 @@
 @param BuildCoursePage page
 
 @template.layout.landing_page(
+  page = page,
   content = @`
     @if(page.getErrors() != null)
         <ul>

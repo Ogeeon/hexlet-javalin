@@ -12,9 +12,9 @@ public final class User {
     private String email;
     private String password;
 
-    public User(String name, String email, String password) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
+    public User(String userName, String userEmail, String userPassword) {
+        this.name = userName;
+        this.email = userEmail;
+        this.password = userPassword;
     }
 }

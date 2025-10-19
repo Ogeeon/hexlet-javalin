@@ -10,6 +10,7 @@ import org.example.hexlet.repository.UserRepository;
 import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
 import static io.javalin.rendering.template.TemplateUtil.model;
+import io.javalin.validation.ValidationException;
 
 public class UsersController {
     public static void index(Context ctx) {
@@ -32,13 +33,26 @@ public class UsersController {
     }
 
     public static void create(Context ctx) {
-        var name = ctx.formParam("name");
-        var email = ctx.formParam("email");
-        var password = ctx.formParam("password");
+        try {
+            var name = ctx.formParamAsClass("name", String.class)
+                .check(value -> value.length() > 0, "Имя не должно быть пустым")
+                .get();
+            var email = ctx.formParamAsClass("email", String.class)
+                .check(value -> value.contains("@"), "В email должен быть знак @")
+                .get();
+            var password = ctx.formParam("password");
 
-        var user = new User(name, email, password);
-        UserRepository.save(user);
-        ctx.redirect(NamedRoutes.usersPath());
+            var user = new User(name, email, password);
+            UserRepository.save(user);
+            ctx.sessionAttribute("flash", "User has been created!");
+            ctx.sessionAttribute("flashType", 0);
+            ctx.redirect(NamedRoutes.usersPath());
+        } catch (ValidationException e) {
+            var page = new BuildUserPage(ctx.formParam("name"), ctx.formParam("email"), e.getErrors());
+            page.setFlash("User cannot be created!");
+            page.setFlashType(1);
+            ctx.render("users/build.jte", model("page", page));
+        }
     }
 
     public static void edit(Context ctx) {
@@ -51,20 +65,7 @@ public class UsersController {
 
 
     public static void update(Context ctx) {
-        var id = ctx.pathParamAsClass("id", Long.class).get();
-
         var name = ctx.formParam("name");
-        var email = ctx.formParam("email");
-        var password = ctx.formParam("password");
-
-        var user = UserRepository.find(id)
-                .orElseThrow(() -> new NotFoundResponse("Entity with id = " + id + " not found"));
-        user.setName(name);
-        user.setEmail(email);
-        user.setPassword(password);
-        UserRepository.save(user);
-        ctx.redirect(NamedRoutes.usersPath());
-        /*var name = ctx.formParam("name");
         var email = ctx.formParam("email");
 
         try {
@@ -78,7 +79,7 @@ public class UsersController {
         } catch (ValidationException e) {
             var page = new BuildUserPage(name, email, e.getErrors());
             ctx.render("users/build.jte", model("page", page));
-        }*/
+        }
     }
 
     public static void destroy(Context ctx) {

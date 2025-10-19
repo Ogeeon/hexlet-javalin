@@ -10,11 +10,15 @@ import org.example.hexlet.repository.CourseRepository;
 import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
 import static io.javalin.rendering.template.TemplateUtil.model;
+import io.javalin.validation.ValidationException;
 
 public class CoursesController {
     public static void index(Context ctx) {
         var courses = CourseRepository.getEntities();
-        var page = new CoursesPage(courses);
+        var term = "";
+        var page = new CoursesPage(courses, term);
+        page.setFlash(ctx.consumeSessionAttribute("flash"));
+        page.setFlashType(ctx.consumeSessionAttribute("flashType"));
         ctx.render("courses/index.jte", model("page", page));
     }
 
@@ -32,12 +36,25 @@ public class CoursesController {
     }
 
     public static void create(Context ctx) {
-        var name = ctx.formParam("name");
-        var description = ctx.formParam("description");
+        try {
+            var name = ctx.formParamAsClass("name", String.class)
+                .check(value -> value.length() > 2, "Name is too short")
+                .get();
+            var description = ctx.formParam("description");
 
-        var course = new Course(name, description);
-        CourseRepository.save(course);
-        ctx.redirect(NamedRoutes.coursesPath());
+            var course = new Course(name, description);
+            CourseRepository.save(course);
+            ctx.sessionAttribute("flash", "Course has been created!");
+            ctx.sessionAttribute("flashType", 0);
+            ctx.redirect(NamedRoutes.coursesPath());
+        } catch (ValidationException e) {
+            var name = ctx.formParam("name");
+            var description = ctx.formParam("description");
+            var page = new BuildCoursePage(name, description, e.getErrors());
+            page.setFlash("Course cannot be created!");
+            page.setFlashType(1);
+            ctx.render("courses/build.jte", model("page", page));
+        }
     }
 
     public static void edit(Context ctx) {

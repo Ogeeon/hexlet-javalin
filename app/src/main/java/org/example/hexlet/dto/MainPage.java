@@ -6,5 +6,5 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class MainPage {
-    private String currentUser;
+    private final String currentUser;
 }
