@@ -1,11 +1,13 @@
 package org.example.hexlet.controller;
 
-import org.example.hexlet.NamedRoutes;
+import java.sql.SQLException;
+
 import org.example.hexlet.dto.courses.BuildCoursePage;
 import org.example.hexlet.dto.courses.CoursePage;
 import org.example.hexlet.dto.courses.CoursesPage;
 import org.example.hexlet.model.Course;
 import org.example.hexlet.repository.CourseRepository;
+import org.example.hexlet.util.NamedRoutes;
 
 import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
@@ -13,7 +15,7 @@ import static io.javalin.rendering.template.TemplateUtil.model;
 import io.javalin.validation.ValidationException;
 
 public class CoursesController {
-    public static void index(Context ctx) {
+    public static void index(Context ctx) throws SQLException {
         var courses = CourseRepository.getEntities();
         var term = "";
         var page = new CoursesPage(courses, term);
@@ -22,7 +24,7 @@ public class CoursesController {
         ctx.render("courses/index.jte", model("page", page));
     }
 
-    public static void show(Context ctx) {
+    public static void show(Context ctx) throws SQLException {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         var course = CourseRepository.find(id)
                 .orElseThrow(() -> new NotFoundResponse("Entity with id = " + id + " not found"));
@@ -35,7 +37,7 @@ public class CoursesController {
         ctx.render("courses/build.jte", model("page", page));
     }
 
-    public static void create(Context ctx) {
+    public static void create(Context ctx) throws SQLException {
         try {
             var name = ctx.formParamAsClass("name", String.class)
                 .check(value -> value.length() > 2, "Name is too short")
@@ -57,7 +59,7 @@ public class CoursesController {
         }
     }
 
-    public static void edit(Context ctx) {
+    public static void edit(Context ctx) throws SQLException {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         var course = CourseRepository.find(id)
                 .orElseThrow(() -> new NotFoundResponse("Entity with id = " + id + " not found"));
@@ -66,7 +68,7 @@ public class CoursesController {
     }
 
 
-    public static void update(Context ctx) {
+    public static void update(Context ctx) throws SQLException {
         var id = ctx.pathParamAsClass("id", Long.class).get();
 
         var name = ctx.formParam("name");
@@ -96,7 +98,7 @@ public class CoursesController {
         }*/
     }
 
-    public static void destroy(Context ctx) {
+    public static void destroy(Context ctx) throws SQLException {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         CourseRepository.delete(id);
         ctx.redirect(NamedRoutes.coursesPath());

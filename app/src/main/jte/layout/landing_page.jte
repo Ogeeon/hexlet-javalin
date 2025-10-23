@@ -1,4 +1,4 @@
-@import org.example.hexlet.NamedRoutes
+@import org.example.hexlet.util.NamedRoutes
 @import org.example.hexlet.dto.BasePage
 @import gg.jte.Content
 @param Content content
@@ -17,6 +17,7 @@
         <p>
             <a href="${NamedRoutes.usersPath()}">Users</a>
             <a href="${NamedRoutes.coursesPath()}">Courses</a>
+            <a href="${NamedRoutes.carsPath()}">Cars</a>
         </p>
         @if(page != null && page.getFlash() != null)
         <div class="alert alert-${page.getFlashType() == 0 ? "success" : "danger"}" role="alert">

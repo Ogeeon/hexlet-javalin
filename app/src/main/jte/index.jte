@@ -1,5 +1,5 @@
 @import org.example.hexlet.dto.MainPage
-@import org.example.hexlet.NamedRoutes
+@import org.example.hexlet.util.NamedRoutes
 @param MainPage page
 
 <!DOCTYPE html>

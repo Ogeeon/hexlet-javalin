@@ -1,4 +1,4 @@
-package org.example.hexlet;
+package org.example.hexlet.util;
 
 public class NamedRoutes {
 
@@ -46,5 +46,25 @@ public class NamedRoutes {
 
     public static String buildSessionsPath() {
         return "/sessions/build";
+    }
+
+    public static String carsPath() {
+        return "/cars";
+    }
+
+    public static String carPath() {
+        return "/cars/{id}";
+    }
+
+    public static String carPath(Long id) {
+        return carPath(String.valueOf(id));
+    }
+
+    public static String carPath(String id) {
+        return "/cars/" + id;
+    }
+
+    public static String buildCarPath() {
+        return "/cars/build";
     }
 }
