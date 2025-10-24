@@ -3,8 +3,8 @@ ENV GRADLE_OPTS="-Xmx2g -Xms512m -XX:MaxMetaspaceSize=512m -Dorg.gradle.daemon=f
 WORKDIR /app
 COPY . .
 RUN ./gradlew clean build --no-daemon --stacktrace
-RUN ls -R .
-RUN ls -R build/libs
+# RUN ls -R .
+RUN ls -R /app/build/libs
 
 FROM eclipse-temurin:21-jre
 WORKDIR /app
