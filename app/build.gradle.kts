@@ -24,6 +24,7 @@ dependencies {
     implementation("io.javalin:javalin-rendering:6.1.3")
     implementation("gg.jte:jte:3.1.9")
     implementation("org.apache.commons:commons-text:1.14.0")
+    implementation("org.postgresql:postgresql:42.7.8")
     implementation("com.h2database:h2:2.2.220")
     implementation("com.zaxxer:HikariCP:5.0.1")
 
