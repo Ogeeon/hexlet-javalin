@@ -5,9 +5,9 @@ COPY . .
 RUN ./gradlew clean build --no-daemon --stacktrace
 
 FROM eclipse-temurin:21-jre
+WORKDIR /app
 RUN ls -R .
 RUN ls -R ./app/build
 RUN ls -R ./app/build/libs
-WORKDIR /app
 COPY --from=builder ./build/libs/app-1.0-SNAPSHOT-all.jar app.jar
 CMD ["java", "-jar", "app.jar"]
