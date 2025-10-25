@@ -21,7 +21,7 @@ import io.javalin.rendering.template.JavalinJte;
 public class HelloWorld {
     public static void main(String[] args) throws SQLException {
         var hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl(getDatabaseUrl()+";DB_CLOSE_DELAY=-1;");
+        hikariConfig.setJdbcUrl(getDatabaseUrl());
 
         var dataSource = new HikariDataSource(hikariConfig);
         // Получаем путь до файла в src/main/resources
@@ -83,8 +83,10 @@ public class HelloWorld {
     }
 
     private static String getDatabaseUrl() {
-    // Получаем url базы данных из переменной окружения DATABASE_URL
-    // Если она не установлена, используем базу в памяти
-    return System.getenv().getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project");
-}
+        String url = System.getenv().getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project");
+        if (url.startsWith("jdbc:h2:")) {
+            url += ";DB_CLOSE_DELAY=-1;";
+        }
+        return url;
+    }
 }
