@@ -8,7 +8,7 @@ RUN echo "🔍 Checking for built JARs:" && find app -type f -name "*.jar" || tr
 
 FROM eclipse-temurin:21-jre
 WORKDIR /app
-COPY . .
+COPY /app .
 COPY --from=builder /app/app/build/libs/app-1.0-SNAPSHOT-all.jar app.jar
 RUN echo "🔍 Checking for JTEs:" && find app -type f -name "*.jte" || true
 CMD ["java", "-jar", "app.jar"]
