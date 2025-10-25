@@ -4,9 +4,10 @@ WORKDIR /app
 COPY . .
 RUN ./gradlew clean build --no-daemon --stacktrace
 # RUN ls -R .
-RUN ls -R /app/build/libs
+RUN ls -R /build/libs
+RUN echo "🔍 Checking for built JARs:" && find /app -type f -name "*.jar" || true
 
 FROM eclipse-temurin:21-jre
 WORKDIR /app
-COPY --from=builder ./build/libs/app-1.0-SNAPSHOT-all.jar app.jar
+COPY --from=builder /build/libs/app-1.0-SNAPSHOT-all.jar app.jar
 CMD ["java", "-jar", "app.jar"]
